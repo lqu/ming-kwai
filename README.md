@@ -1,6 +1,8 @@
-# Create Your Own Chinese Character that Never Existed Before
+# Create Your Own Chinese Characters that Never Existed Before
 Be creative and combine radicals in arbitrary ways. Have fun and confuse OCR.
+
 ## Examples
+
 明快中文英文打字機
 ![sample-1](generated_samples/ming-kwai-1.png)
 ![sample-2](generated_samples/ming-kwai-2.png)
