@@ -5,45 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Create Chinese Characters</title>
   <style>
-
     body {
       font-family: "Noto Serif TC", serif;
       margin: 0;
       padding: 0;
-      background-color: #fff8dc; /* Light parchment color */
+      background-color: #fff8dc;
     }
-    
     body::before {
       content: "";
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: url("ming-kwai-typewriter-keyboard.png") no-repeat center top fixed;
       background-size: auto;
-      opacity: 0.9; /* 90% transparent image */
-      z-index: -2; /* Keep it behind everything */
+      opacity: 0.9;
+      z-index: -2;
     }
-    
     body::after {
       content: "";
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background-color: rgba(255, 248, 220, 0.5); /* Yellowish overlay */
-      z-index: -1; /* On top of the image, below the content */
+      background-color: rgba(255, 248, 220, 0.5);
+      z-index: -1;
     }
-    
     h2 {
       color: #333;
       text-align: center;
       margin-top: 20px;
     }
-
-    p.copy {
-      font-size: 18px;
-      margin: 0 0 5px 0;
+    .radical-section {
+      max-width: 400px;
+      margin: 10px auto;
       text-align: center;
-      color: #444;
     }
-
+    .radical-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .radical-buttons button {
+      padding: 10px 14px;
+      font-size: 18px;
+      border-radius: 50%;
+      border: 2px solid #aaa;
+      background: radial-gradient(circle at top left, #f5f5dc, #dcdcc4);
+      cursor: pointer;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.8);
+      transition: transform 0.1s ease-in-out;
+    }
+    .radical-buttons button:active {
+      transform: scale(0.95);
+    }
     .container {
       max-width: 90%;
       width: 400px;
@@ -52,22 +65,20 @@
       background: rgba(255, 255, 255, 0.95);
       border-radius: 10px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      flex-shrink: 0;
     }
-
     .input-group {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin: 10px 0;
     }
-
     .input-group label {
       flex: 1;
       text-align: right;
       padding-right: 10px;
       font-weight: bold;
     }
-
     .input-group input,
     .input-group select {
       flex: 2;
@@ -76,10 +87,12 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       text-align: center;
-      background-color: white;
+      background-color: #f0f0f0;
     }
-
-    button {
+    .input-group input[readonly] {
+      cursor: default;
+    }
+    button#get-image {
       width: 100%;
       padding: 14px;
       font-size: 18px;
@@ -91,11 +104,9 @@
       cursor: pointer;
       margin-top: 10px;
     }
-
-    button:hover {
+    button#get-image:hover {
       background: #005ea6;
     }
-
     #image-container {
       display: flex;
       justify-content: center;
@@ -103,91 +114,209 @@
       flex-direction: column;
       margin-top: 20px;
     }
-    
     #character-image {
-      width: 128px; /* Force exact original width */
-      height: 128px; /* Force exact original height */
-      display: none; /* Initially hidden */
-      background: rgba(255, 248, 220, 0.5); /* Parchment effect */
-      opacity: 0.9; /* 90% transparency */
+      width: 128px;
+      height: 128px;
+      display: none;
+      background: rgba(255, 248, 220, 0.5);
+      opacity: 0.9;
       border: 2px solid #ddd;
       border-radius: 5px;
       padding: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    
     #status {
       font-size: 16px;
       font-weight: bold;
       color: #555;
       margin-top: 10px;
     }
-  </style>
+    .layout {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: nowrap;
+      gap: 20px;
+      padding: 0 20px;
+      margin-top: 10px;
+    }
+    .side-panel {
+      flex: 1;
+      max-width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .radical-buttons button.dim {
+      opacity: 0.25;
+      filter: grayscale(100%);
+    }
+    #pinyin-display {
+      text-align: center;
+      margin: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #555;
+      font-family: monospace;
+    }
+</style>
 </head>
 <body>
-
   <h2>Combine Radicals</h2>
 
-  <p class="copy">Copy from here: ⿰⿱⿴</p>
-  <p class="copy">Example: ⺶吉</p>
+  <div class="layout">
+    <div id="radicals-a" class="radical-buttons side-panel"></div>
 
-  <div class="container">
-    <div class="input-group">
-      <label for="structure">Structure:</label>
-      <input type="text" id="structure" value="⿰" size="2">
+    <div class="container">
+      <div class="input-group">
+        <label for="structure">Structure:</label>
+        <select id="structure" onchange="updateRadicals()">
+          <option value="⿰">Left-Right (⿰)</option>
+          <option value="⿱">Top-Bottom (⿱)</option>
+          <option value="⿴">Outer-Inner (⿴)</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="A">Component A:</label>
+        <input type="text" id="A" size="2" readonly>
+      </div>
+      <div class="input-group">
+        <label for="B">Component B:</label>
+        <input type="text" id="B" size="2" readonly>
+      </div>
+      <div class="input-group">
+        <label for="style">Style:</label>
+        <select id="style">
+          <option value="HinaMincho">HinaMincho</option>
+          <option value="KleeOne">KleeOne</option>
+          <option value="KiwiMaru">KiwiMaru</option>
+          <option value="MPLUS1p-Thin">MPLUS1p-Thin</option>
+          <option value="NotoSansSC">NotoSansSC</option>
+          <option value="NotoSerifSC-Light">NotoSerifSC-Light</option>
+          <option value="NotoSansTC-ExtraBold" selected>NotoSansTC-ExtraBold</option>
+        </select>
+      </div>
+      <button id="get-image" onclick="fetchCharacterImage()">Get Image</button>
+      <div id="image-container">
+        <p id="status"></p>
+        <img id="character-image" alt="Character Image">
+      </div>
     </div>
 
-    <div class="input-group">
-      <label for="A">Component A:</label>
-      <input type="text" id="A" value="⺶" size="2">
-    </div>
-
-    <div class="input-group">
-      <label for="B">Component B:</label>
-      <input type="text" id="B" value="吉" size="2">
-    </div>
-
-    <div class="input-group">
-      <label for="style">Style:</label>
-      <select id="style">
-        <option value="HinaMincho" selected>HinaMincho</option>
-        <option value="KleeOne">KleeOne</option>
-        <option value="KiwiMaru">KiwiMaru</option>
-        <option value="MPLUS1p-Thin">MPLUS1p-Thin</option>
-        <option value="NotoSansSC">NotoSansSC</option>
-        <option value="NotoSerifSC-Light">NotoSerifSC-Light</option>
-        <option value="NotoSansTC-ExtraBold">NotoSansTC-ExtraBold</option>
-      </select>
-    </div>
-
-    <button onclick="fetchCharacterImage()">Get Image</button>
-
-    <div id="image-container">
-      <p id="status"></p>
-      <img id="character-image" alt="Character Image">
-    </div>
+    <div id="radicals-b" class="radical-buttons side-panel"></div>
   </div>
-
   <script>
+    const radicalOptions = {
+      "⿰": {
+        A: ["氵", "木", "扌", "釒", "口", "亻", "女", "忄",
+            "糹", "言", "虫", "土", "火", "月", "王", "石",
+            "魚", "钅", "⻊", "衤", "山", "犭", "目", "日",
+            "馬", "禾", "讠", "纟", "阝", "車", "礻", "米",
+            "酉", "飠", "鱼", "革", "舟", "巾", "貝", "彳",
+            "牛", "耳", "歹", "冫", "马", "饣", "骨", "车",
+            "弓", "齒", "立", "豸", "白", "田", "角", "身",
+            "贝", "耒", "黑", "⺶", "鼠", "豕", "韋", "鳥",
+            "缶", "片", "麥", "牜", "谷", "香", "子", "舌",
+            "矢", "鼻", "羽", "爿", "方", "音", "赤", "齿",
+            "又", "青", "镸", "血", "高", "夕", "句", "豆",
+            "工", "雚", "至", "束", "吉", "矛", "龺", "文",
+            "令", "合", "鬲"],
+        B: ["鳥", "阝", "刂", "頁", "力", "欠", "鸟", "攵",
+            "見", "隹", "皮", "页", "令", "各", "斤", "且",
+            "殳", "瓦", "台", "句", "分", "羽", "戈", "占",
+            "干", "夋", "召", "包", "交", "合", "卑", "肖",
+            "青", "者", "乚", "甫", "毛", "勺", "可", "今",
+            "奇", "犮", "周", "扁", "需", "堯", "兼", "屯",
+            "兆", "昷", "果", "枼", "翏", "丁", "艮", "氐",
+            "并", "同", "卒", "是", "昜", "單", "圭", "昆",
+            "曷", "票", "蒦", "俞", "乞", "吉", "良", "它",
+            "乍", "炎", "至", "軍", "粦", "番", "也", "亢",
+            "巨", "失", "其", "旁", "亥", "反", "余", "工",
+            "少", "方", "古", "由", "喬", "尞", "龍", "襄",
+            "皇", "非", "及"]
+      },
+      "⿱": {
+        A: ['艹', '⺮', '山', '宀', '⻗', '穴', '髟', '日',
+            '罒', '一', '大', '人', '口', '辟', '冖', '敝',
+            '此', '⺈', '亦', '敖', '亠', '䜌', '林', '丿',
+            '龹', '丷', '折', '羽', '非', '文', '立', '敄',
+            '田', '次', '龍', '⺷', '爫', '加', '臤', '⺊',
+            '分', '木', '般', '殹', '丶', '厶', '亡', '奴',
+            '禾', '殸', '執', '秋', '夂', '十', '代', '覀',
+            '不', '白', '龶', '二', '水', '尚', '土', '比',
+            '夗', '合', '沙', '列', '执', '其', '斬', '鼓',
+            '吅', '隹', '小', '龸', '今', '天', '將', '米',
+            '自', '八', '士', '丆', '亼', '父', '與', '任',
+            '耂', '臼', '龙', '壯', '如', '巩', '敬', '埶',
+            '畾', '賏', '玨'],
+
+        B: ['心', '土', '木', '虫', '女', '鳥', '皿', '金',
+            '日', '火', '口', '灬', '貝', '手', '山', '衣',
+            '一', '贝', '石', '言', '糸', '月', '巾', '乙',
+            '儿', '目', '大', '子', '田', '力', '水', '廾',
+            '几', '十', '馬', '耳', '牛', '鸟', '米', '寸',
+            '毛', '小', '足', '魚', '八', '示', '玉', '厶',
+            '又', '夕', '巴', '隹', '食', '马', '犬', '見',
+            '弓', '刀', '瓦', '用', '肉', '王', '龍', '黽',
+            '人', '二', '夂', '电', '旦', '云', '辰', '立',
+            '車', '且', '鹿', '缶', '乂', '匕', '可', '氺',
+            '共', '天', '叱', '卯', '豆', '林', '羽', '酉',
+            '角', '革', '異', '鱼', '丁', '⺀', '朩', '龰',
+            '非', '卜', '丂']
+      },
+      "⿴": {
+        A: ['囗', '又', '卩', '井'],
+        B: ['丶', '夂', '人', '儿', '厶', '子', '口',
+           '大', '女', '才', '寸', '屯', '亢', '水', '不',
+           '云', '勿', '元', '化', '木', '井', '仑', '令',
+           '古', '民', '台', '冬', '言', '豕', '甫', '吾',
+           '侖', '卷', '或', '韋', '巻', '尃', '書', '專',
+           '睘', '王', '韦', '禾', '正', '有', '员', '幸',
+           '青', '耑', '袁', '䜌', '玉', '貟', '員', '盍',
+           '啚', '貴', '睪', '欒']
+      }
+    };
+
+    function updateRadicals() {
+      const structure = document.getElementById("structure").value;
+      const containerA = document.getElementById("radicals-a");
+      const containerB = document.getElementById("radicals-b");
+      containerA.innerHTML = "";
+      containerB.innerHTML = "";
+
+      radicalOptions[structure].A.forEach(radical => {
+        const btn = document.createElement("button");
+        btn.textContent = radical;
+        btn.onclick = () => document.getElementById("A").value = radical;
+        containerA.appendChild(btn);
+      });
+
+      radicalOptions[structure].B.forEach(radical => {
+        const btn = document.createElement("button");
+        btn.textContent = radical;
+        btn.onclick = () => document.getElementById("B").value = radical;
+        containerB.appendChild(btn);
+      });
+    }
+
     async function fetchCharacterImage() {
-      const structure = document.getElementById("structure").value.trim();
+      const structure = document.getElementById("structure").value;
       const A = document.getElementById("A").value.trim();
       const B = document.getElementById("B").value.trim();
-      const style = document.getElementById("style").value.trim();
+      const style = document.getElementById("style").value;
 
-      if (!structure || !A || !B) {
-        alert("Please enter Structure, Component A, and Component B.");
+      if (!A || !B) {
+        alert("Please select Component A and Component B.");
         return;
       }
 
-      const apiUrl = "https://xhfjfxihgg.execute-api.us-west-2.amazonaws.com"; // Replace with your actual API Gateway URL
-
-      const requestData = {
-        structure: structure,
-        A: A,
-        B: B,
-        style: style
-      };
+      const apiUrl = "https://xhfjfxihgg.execute-api.us-west-2.amazonaws.com";
+      const requestData = { structure, A, B, style };
 
       document.getElementById("status").innerText = "Fetching image...";
       document.getElementById("character-image").style.display = "none";
@@ -195,9 +324,7 @@
       try {
         const response = await fetch(apiUrl, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestData)
         });
 
@@ -206,17 +333,53 @@
         if (result.message === "success" && result.image) {
           document.getElementById("character-image").src = `data:image/png;base64,${result.image}`;
           document.getElementById("character-image").style.display = "block";
-          document.getElementById("status").innerText = "Character found!";
+          document.getElementById("status").innerText = "Presto!";
         } else {
           document.getElementById("status").innerText = result.message;
         }
       } catch (error) {
         console.error("Error fetching image:", error);
-        document.getElementById("status").innerText = "Error fetching image.";
+        document.getElementById("status").innerText = "Image not cached yet. Dynamic generation feature coming soon!";
       }
     }
-  </script>
 
+    updateRadicals();
+let pinyinBuffer = "";
+
+const pinyinMap = { "⺀": "⺀", "⺈": "⺈", "⺊": "⺊", "⺮": "⺮", "⺶": "⺶", "⺷": "⺷", "⻊": "⻊", "⻗": "⻗", "䜌": "luan", "一": "yi", "丁": "ding", "丂": "kao", "丆": "han", "不": "bu", "且": "qie", "丶": "zhu", "丷": "ba", "丿": "pie", "乂": "yi", "乍": "zha", "乙": "yi", "乚": "yin", "乞": "qi", "也": "ye", "二": "er", "云": "yun", "井": "jing", "亠": "tou", "亡": "wang", "亢": "kang", "交": "jiao", "亥": "hai", "亦": "yi", "人": "ren", "亻": "ren", "亼": "ji", "今": "jin", "仑": "lun", "代": "dai", "令": "ling", "任": "ren", "余": "yu", "侖": "lun", "俞": "yu", "儿": "er", "元": "yuan", "兆": "zhao", "八": "ba", "共": "gong", "其": "qi", "兼": "jian", "冖": "mi", "冫": "bing", "冬": "dong", "几": "ji", "刀": "dao", "刂": "dao", "分": "fen", "列": "lie", "力": "li", "加": "jia", "勺": "shao", "勿": "wu", "包": "bao", "匕": "bi", "化": "hua", "十": "shi", "卑": "bei", "卒": "zu", "卜": "bo", "占": "zhan", "卩": "jie", "卯": "mao", "卷": "juan", "厶": "si", "又": "you", "及艹": "ji", "反": "fan", "口": "kou", "古": "gu", "句": "ju", "召": "zhao", "可": "ke", "台": "tai", "叱": "chi", "各": "ge", "吅": "xuan", "合": "he", "吉": "ji", "同": "tong", "吾": "wu", "员": "yuan", "周": "zhou", "員": "yuan", "啚": "bi", "喬": "qiao", "單": "dan", "囗": "wei", "土": "tu", "圭": "gui", "埶": "yi", "執": "zhi", "堯": "yao", "士": "shi", "壯": "zhuang", "夂": "zhi", "夋": "qun", "夕": "xi", "夗": "yuan", "大": "da", "天": "tian", "失": "shi", "奇": "qi", "女": "nv", "奴": "nu", "如": "ru", "子": "zi", "宀": "mian", "它": "ta", "寸": "cun", "尃": "fu", "將": "jiang", "專": "zhuan", "小": "xiao", "少": "shao", "尚": "shang", "尞": "liao", "屯": "tun", "山": "shan", "工": "gong", "巨": "ju", "巩": "gong", "巴": "ba", "巻": "juan", "巾": "jin", "干": "gan", "并": "bing", "幸": "xing", "廾": "gong", "弓": "gong", "彳": "chi", "心": "xin", "忄": "xin", "戈": "ge", "或": "huo", "扁": "bian", "手": "shou", "扌": "shou", "才": "cai", "执": "zhi", "折": "zhe", "攵": "pu", "敄": "wu", "敖": "ao", "敝": "bi", "敬": "jing", "文": "wen", "斤": "jin", "斬": "zhan", "方": "fang", "旁": "pang", "日": "ri", "旦": "dan", "昆": "kun", "昜": "yang", "是": "shi", "昷": "wen", "曷": "he", "書": "shu", "月": "yue", "有": "you", "木": "mu", "朩": "deng", "束": "shu", "林": "lin", "果": "guo", "枼": "ye", "欒": "luan", "欠": "qian", "次": "ci", "正": "zheng", "此": "ci", "歹": "dai", "殳": "shu", "殸": "qing", "殹": "yi", "比": "bi", "毛": "mao", "氐": "di", "民": "min", "水": "shui", "氵": "shui", "氺": "shui", "沙": "sha", "火": "huo", "灬": "biao", "炎": "yan", "爫": "zhao", "父": "fu", "爿": "pan", "片": "pian", "牛": "niu", "牜": "niu", "犬": "quan", "犭": "quan", "犮": "ba", "玉": "yu", "王": "wang", "玨": "jue", "瓦": "wa", "用": "yong", "甫": "fu", "田": "tian", "由": "you", "电": "dian", "番": "fan", "異": "yi", "畾": "lei", "白": "bai", "皇": "huang", "皮": "pi", "皿": "min", "盍": "he", "目": "mu", "睘": "qiong", "睪": "yi", "矛": "mao", "矢": "shi", "石": "shi", "示": "shi", "礻": "shi", "票": "piao", "禾": "he", "秋": "qiu", "穴": "xue", "立": "li", "米": "mi", "粦": "lin", "糸": "mi", "糹": "si", "纟": "si", "缶": "fou", "罒": "wang", "羽": "yu", "翏": "liu", "耂": "lao", "者": "zhe", "耑": "duan", "耒": "lei", "耳": "er", "肉": "rou", "肖": "xiao", "臤": "qian", "自": "zi", "至": "zhi", "臼": "jiu", "與": "yu", "舌": "she", "舟": "zhou", "般": "ban", "艮": "gen", "良": "liang", "蒦": "huo", "虫": "chong", "血": "xue", "衣": "yi", "衤": "yi", "袁": "yuan", "襄": "xiang", "覀": "xi", "見": "jian", "角": "jiao", "言": "yan", "讠": "yan", "谷": "gu", "豆": "dou", "豕": "shi", "豸": "zhi", "貝": "bei", "貟": "yuan", "貴": "gui", "賏": "ying", "贝": "bei", "赤": "chi", "足": "zu", "身": "shen", "車": "che", "軍": "jun", "车": "che", "辟": "pi", "辰": "chen", "酉": "you", "金": "jin", "釒": "jin", "钅": "jin", "镸": "chang", "阝": "fu", "隹": "zhui", "雚": "guan", "需": "xu", "青": "qing", "非": "fei", "革": "ge", "韋": "wei", "韦": "wei", "音": "yin", "頁": "ye", "页": "ye", "食": "shi", "飠": "shi", "饣": "shi", "香": "xiang", "馬": "ma", "马": "ma", "骨": "gu", "高": "gao", "髟": "biao", "鬲": "ge", "魚": "yu", "鱼": "yu", "鳥": "niao", "鸟": "niao", "鹿": "lu", "麥": "mai", "黑": "hei", "黽": "mian", "鼓": "gu", "鼠": "shu", "鼻": "bi", "齒": "chi", "齿": "chi", "龍": "long", "龙": "long", "龰": "龰", "龶": "龶", "龸": "龸", "龹": "龹", "龺": "龺", };
+
+function filterRadicalsFromBuffer() {
+  document.getElementById("pinyin-display").textContent = pinyinBuffer ? "Pinyin: " + pinyinBuffer : "";
+  ["a", "b"].forEach(slot => {
+    const container = document.getElementById(`radicals-${slot}`);
+    Array.from(container.children).forEach(btn => {
+      const char = btn.textContent;
+      const py = pinyinMap[char] || "";
+      const match = !pinyinBuffer || py.startsWith(pinyinBuffer);
+      btn.classList.toggle("dim", !match);
+    });
+  });
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key.length === 1 && /[a-z]/i.test(e.key)) {
+    pinyinBuffer += e.key.toLowerCase();
+    filterRadicalsFromBuffer();
+  } else if (e.key === "Backspace" || e.key === "Delete") {
+    pinyinBuffer = pinyinBuffer.slice(0, -1);
+    filterRadicalsFromBuffer();
+  } else if (e.key === "Escape") {
+    pinyinBuffer = "";
+    filterRadicalsFromBuffer();
+  }
+}, false);
+
+window.addEventListener("wheel", (e) => {
+  // Do not reset pinyinBuffer on scroll
+}, { passive: true });
+
+  </script>
+<div id="pinyin-display"></div>
 </body>
 </html>
 
