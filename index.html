@@ -331,16 +331,20 @@
 
         const result = await response.json();
 
-        if (result.message === "success" && result.image) {
-          document.getElementById("character-image").src = `data:image/png;base64,${result.image}`;
-          document.getElementById("character-image").style.display = "block";
-          document.getElementById("status").innerText = result.detail;
-        } else {
+        if (result.message === "success") {
+          if (result.image) { // Unicode OK, and found with font
+            document.getElementById("character-image").src = `data:image/png;base64,${result.image}`;
+            document.getElementById("character-image").style.display = "block";
+            document.getElementById("status").innerText = result.detail;
+          } else { // Unicode OK, but font doesn't support
+            document.getElementById("status").innerText = `${result.detail}, but this font doesn't support it yet.`;
+          }
+        } else { // char didn't exist, but not generated yet
           document.getElementById("status").innerText = result.message;
         }
       } catch (error) {
         console.error("Error fetching image:", error);
-        document.getElementById("status").innerText = "Image not cached yet. Dynamic generation feature coming soon!";
+        document.getElementById("status").innerText = "Error fetching image!";
       }
     }
 
