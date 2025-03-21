@@ -1,3 +1,9 @@
+## [0.2.0] - 2025-03-20
+### Added
+- Display server message, real or fake
+- Adjusted UI layout
+- Default font to NotoSerif, best Unicode support
+
 ## [0.1.1] - 2025-03-20
 ### Added
 - Radical buttons, click to input

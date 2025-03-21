@@ -27,7 +27,7 @@
       background-color: rgba(255, 248, 220, 0.5);
       z-index: -1;
     }
-    h2 {
+    h1 {
       color: #333;
       text-align: center;
       margin-top: 20px;
@@ -167,8 +167,8 @@
 </style>
 </head>
 <body>
-  <h2>Combine Radicals</h2>
-
+  <h1>Combine Radicals</h1>
+  <p style="text-align:center; font-size:16px; color:#666;">Start typing pinyin to filter</p>
   <div class="layout">
     <div id="radicals-a" class="radical-buttons side-panel"></div>
 
@@ -197,8 +197,8 @@
           <option value="KiwiMaru">KiwiMaru</option>
           <option value="MPLUS1p-Thin">MPLUS1p-Thin</option>
           <option value="NotoSansSC">NotoSansSC</option>
-          <option value="NotoSerifSC-Light">NotoSerifSC-Light</option>
-          <option value="NotoSansTC-ExtraBold" selected>NotoSansTC-ExtraBold</option>
+          <option value="NotoSerifSC-Light" selected>NotoSerifSC-Light</option>
+          <option value="NotoSansTC-ExtraBold">NotoSansTC-ExtraBold</option>
         </select>
       </div>
       <button id="get-image" onclick="fetchCharacterImage()">Get Image</button>
@@ -206,6 +206,7 @@
         <p id="status"></p>
         <img id="character-image" alt="Character Image">
       </div>
+      <div id="pinyin-display"></div>
     </div>
 
     <div id="radicals-b" class="radical-buttons side-panel"></div>
@@ -333,7 +334,7 @@
         if (result.message === "success" && result.image) {
           document.getElementById("character-image").src = `data:image/png;base64,${result.image}`;
           document.getElementById("character-image").style.display = "block";
-          document.getElementById("status").innerText = "Presto!";
+          document.getElementById("status").innerText = result.detail;
         } else {
           document.getElementById("status").innerText = result.message;
         }
@@ -379,7 +380,6 @@ window.addEventListener("wheel", (e) => {
 }, { passive: true });
 
   </script>
-<div id="pinyin-display"></div>
 </body>
 </html>
 
