@@ -1,108 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Chinese Characters</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-        }
-        input, button {
-            padding: 10px;
-            margin: 5px;
-            font-size: 16px;
-        }
-        #image-container {
-            margin-top: 20px;
-        }
-        #character-image {
-            max-width: 300px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            display: none;
-            margin: 20px auto;  /* Center horizontally */
-            display: block;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Chinese Characters</title>
+  <style>
+
+    body {
+      font-family: "Noto Serif TC", serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff8dc; /* Light parchment color */
+    }
+    
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url("ming-kwai-typewriter-keyboard.png") no-repeat center top fixed;
+      background-size: auto;
+      opacity: 0.9; /* 90% transparent image */
+      z-index: -2; /* Keep it behind everything */
+    }
+    
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(255, 248, 220, 0.5); /* Yellowish overlay */
+      z-index: -1; /* On top of the image, below the content */
+    }
+    
+    h2 {
+      color: #333;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    p.copy {
+      font-size: 18px;
+      margin: 0 0 5px 0;
+      text-align: center;
+      color: #444;
+    }
+
+    .container {
+      max-width: 90%;
+      width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+
+    .input-group label {
+      flex: 1;
+      text-align: right;
+      padding-right: 10px;
+      font-weight: bold;
+    }
+
+    .input-group input,
+    .input-group select {
+      flex: 2;
+      padding: 12px;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      text-align: center;
+      background-color: white;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      font-weight: bold;
+      background: #0078D7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #005ea6;
+    }
+
+    #image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      margin-top: 20px;
+    }
+    
+    #character-image {
+      width: 128px; /* Force exact original width */
+      height: 128px; /* Force exact original height */
+      display: none; /* Initially hidden */
+      background: rgba(255, 248, 220, 0.5); /* Parchment effect */
+      opacity: 0.9; /* 90% transparency */
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    #status {
+      font-size: 16px;
+      font-weight: bold;
+      color: #555;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
 
-    <h2>Combine Radicals</h2>
-	<p>Copy from here: 
-	<p>⿰⿱⿴
-	<p>⺶吉
-	<p>
-    
-    <label for="structure">Structure:</label>
-    <input type="text" id="structure" value="⿰" size="2">
+  <h2>Combine Radicals</h2>
 
-    <label for="A">Component A:</label>
-    <input type="text" id="A" value="⺶" size="2">
+  <p class="copy">Copy from here: ⿰⿱⿴</p>
+  <p class="copy">Example: ⺶吉</p>
 
-    <label for="B">Component B:</label>
-    <input type="text" id="B" value="吉" size="2">
+  <div class="container">
+    <div class="input-group">
+      <label for="structure">Structure:</label>
+      <input type="text" id="structure" value="⿰" size="2">
+    </div>
 
-    <label for="style">Style:</label>
-    <input type="text" id="style" value="HinaMincho">
+    <div class="input-group">
+      <label for="A">Component A:</label>
+      <input type="text" id="A" value="⺶" size="2">
+    </div>
+
+    <div class="input-group">
+      <label for="B">Component B:</label>
+      <input type="text" id="B" value="吉" size="2">
+    </div>
+
+    <div class="input-group">
+      <label for="style">Style:</label>
+      <select id="style">
+        <option value="HinaMincho" selected>HinaMincho</option>
+        <option value="KleeOne">KleeOne</option>
+        <option value="KiwiMaru">KiwiMaru</option>
+        <option value="MPLUS1p-Thin">MPLUS1p-Thin</option>
+        <option value="NotoSansSC">NotoSansSC</option>
+        <option value="NotoSerifSC-Light">NotoSerifSC-Light</option>
+        <option value="NotoSansTC-ExtraBold">NotoSansTC-ExtraBold</option>
+      </select>
+    </div>
 
     <button onclick="fetchCharacterImage()">Get Image</button>
 
     <div id="image-container">
-        <p id="status"></p>
-        <img id="character-image" alt="Character Image">
+      <p id="status"></p>
+      <img id="character-image" alt="Character Image">
     </div>
+  </div>
 
-    <script>
-        async function fetchCharacterImage() {
-            const structure = document.getElementById("structure").value.trim();
-            const A = document.getElementById("A").value.trim();
-            const B = document.getElementById("B").value.trim();
-            const style = document.getElementById("style").value.trim();
+  <script>
+    async function fetchCharacterImage() {
+      const structure = document.getElementById("structure").value.trim();
+      const A = document.getElementById("A").value.trim();
+      const B = document.getElementById("B").value.trim();
+      const style = document.getElementById("style").value.trim();
 
-            if (!structure || !A || !B) {
-                alert("Please enter Structure, Component A, and Component B.");
-                return;
-            }
+      if (!structure || !A || !B) {
+        alert("Please enter Structure, Component A, and Component B.");
+        return;
+      }
 
-            const apiUrl = "https://xhfjfxihgg.execute-api.us-west-2.amazonaws.com"; // Replace with your actual API Gateway URL
+      const apiUrl = "https://xhfjfxihgg.execute-api.us-west-2.amazonaws.com"; // Replace with your actual API Gateway URL
 
-            const requestData = {
-                structure: structure,
-                A: A,
-                B: B,
-                style: style
-            };
+      const requestData = {
+        structure: structure,
+        A: A,
+        B: B,
+        style: style
+      };
 
-            document.getElementById("status").innerText = "Fetching image...";
-            document.getElementById("character-image").style.display = "none";
+      document.getElementById("status").innerText = "Fetching image...";
+      document.getElementById("character-image").style.display = "none";
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(requestData)
-                });
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(requestData)
+        });
 
-                const result = await response.json();
+        const result = await response.json();
 
-                if (result.message === "success" && result.image) {
-                    document.getElementById("character-image").src = `data:image/png;base64,${result.image}`;
-                    document.getElementById("character-image").style.display = "block";
-                    document.getElementById("status").innerText = "Character found!";
-                } else {
-                    document.getElementById("status").innerText = result.message;
-                }
-            } catch (error) {
-                console.error("Error fetching image:", error);
-                document.getElementById("status").innerText = "Error fetching image.";
-            }
+        if (result.message === "success" && result.image) {
+          document.getElementById("character-image").src = `data:image/png;base64,${result.image}`;
+          document.getElementById("character-image").style.display = "block";
+          document.getElementById("status").innerText = "Character found!";
+        } else {
+          document.getElementById("status").innerText = result.message;
         }
-    </script>
+      } catch (error) {
+        console.error("Error fetching image:", error);
+        document.getElementById("status").innerText = "Error fetching image.";
+      }
+    }
+  </script>
 
 </body>
 </html>
