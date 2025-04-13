@@ -14,3 +14,8 @@ Be creative and combine radicals in arbitrary ways. Have fun and confuse OCR.
 
 Since 峯==峰 , 崖==崕, 羣==群, 美,加,墨 can have new forms, too.
 ![sample-3](generated_samples/ming-kwai-3.png)
+
+On seeing ![this](generated_samples/diaochan.png), people might think of 貂蟬, but the chars don't exist.
+
+If you don't want OCR to see 蘇東坡, use this.
+![su](generated_samples/su.png) ![dongpo](generated_samples/dongpo.png)
