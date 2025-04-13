@@ -18,4 +18,4 @@ Since 峯==峰 , 崖==崕, 羣==群, 美,加,墨 can have new forms, too.
 On seeing ![this](generated_samples/diaochan.png), people might think of 貂蟬, but the chars don't exist.
 
 If you don't want OCR to see 蘇東坡, use this.
-![su](generated_samples/su.png) ![dongpo](generated_samples/dongpo.png)
+<img src="generated_samples/su.png" width="128" /> <img src="generated_samples/dongpo.png" width="128" />
