@@ -1,6 +1,11 @@
 # Create Your Own Chinese Characters that Never Existed Before
 Be creative and combine radicals in arbitrary ways. Have fun and confuse OCR.
 
+- Pre-generated cache
+  - https://lqu.github.io/ming-kwai
+- Dynamic generation
+  - https://huggingface.co/spaces/lqume/neochar
+
 ## Examples
 
 明快中文英文打字機
