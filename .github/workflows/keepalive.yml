@@ -1,0 +1,12 @@
+name: Keep HF Space Warm
+on:
+  schedule:
+    - cron: "0 */12 * * *"   # every 12 hours
+  workflow_dispatch: {}
+jobs:
+  curl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Space
+        run: |
+          curl -sSf https://huggingface.co/spaces/lqume/neochar || true
